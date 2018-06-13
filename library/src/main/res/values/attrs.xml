@@ -2,11 +2,16 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <declare-styleable name="StepperIndicator" tools:ignore="ResourceName">
         <attr name="stpi_stepCount" format="integer"/>
+        <attr name="stpi_currentStep" format="integer"/>
         <attr name="stpi_animDuration" format="integer"/>
 
         <attr name="stpi_circleColor" format="color"/>
         <attr name="stpi_circleRadius" format="dimension"/>
         <attr name="stpi_circleStrokeWidth" format="dimension"/>
+        <attr name="stpi_circleStyle">
+            <enum name="fill" value="0" /> <!-- Paint.Style.FILL ordinal -->
+            <enum name="stroke" value="1" /> <!-- Paint.Style.STROKE ordinal -->
+        </attr>
 
         <attr name="stpi_indicatorColor" format="color"/>
         <attr name="stpi_indicatorRadius" format="dimension"/>
@@ -18,6 +23,9 @@
 
         <attr name="stpi_showDoneIcon" format="boolean"/>
         <attr name="stpi_showStepNumberInstead" format="boolean"/>
+        <attr name="stpi_showCurrentStepAsBullet" format="boolean"/>
+        <attr name="stpi_showCurrentStepLabelAsDone" format="boolean" />
+        <attr name="stpi_stepNumberColor" format="color"/>
         <attr name="stpi_doneIconDrawable" format="reference"/>
 
         <attr name="stpi_useBottomIndicator" format="boolean"/>
@@ -34,5 +42,6 @@
         <attr name="stpi_labelMarginTop" format="dimension"/>
         <attr name="stpi_labelSize" format="dimension"/>
         <attr name="stpi_labelColor" format="color"/>
+        <attr name="stpi_labelDoneColor" format="color"/>
     </declare-styleable>
 </resources>

@@ -227,6 +227,8 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
      */
     private boolean showStepTextNumber;
 
+    private boolean showCurrentStepAsBullet;
+    private boolean showCurrentStepLabelAsDone;
     /**
      * Paint used to draw the number indicator for all steps.
      */
@@ -241,6 +243,11 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
      * Paint used to draw the indicator circle for the current and cleared steps
      */
     private Paint indicatorPaint;
+
+    /**
+     * Paint used to draw the indicator circle for the cleared steps
+     */
+    private Paint indicatorDonePaint;
 
     /**
      * List of {@link Paint} objects used by each step indicating the current and cleared steps.
@@ -351,11 +358,14 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
 
     // If viewpager is attached, viewpager's page titles are used when {@code showLabels} equals true
     private TextPaint labelPaint;
+    private TextPaint labelDonePaint;
+    private boolean hasLabelDoneColor = false;
     private CharSequence[] labels;
     private boolean showLabels;
     private float labelMarginTop;
     private float labelSize;
     private StaticLayout[] labelLayouts;
+    private StaticLayout[] labelDoneLayouts;
     private float maxLabelHeight;
 
     // Running animations
@@ -472,9 +482,13 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
         final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.StepperIndicator, defStyleAttr, 0);
 
         circlePaint = new Paint();
-        circlePaint.setStrokeWidth(
-                a.getDimension(R.styleable.StepperIndicator_stpi_circleStrokeWidth, defaultCircleStrokeWidth));
-        circlePaint.setStyle(Paint.Style.STROKE);
+        int circleStyle = a.getInt(R.styleable.StepperIndicator_stpi_circleStyle, Paint.Style.STROKE.ordinal());
+        if(circleStyle == Paint.Style.FILL.ordinal()){
+            circlePaint.setStyle(Paint.Style.FILL);
+        }else{
+            circlePaint.setStrokeWidth(a.getDimension(R.styleable.StepperIndicator_stpi_circleStrokeWidth, defaultCircleStrokeWidth));
+            circlePaint.setStyle(Paint.Style.STROKE);
+        }
         circlePaint.setColor(a.getColor(R.styleable.StepperIndicator_stpi_circleColor, defaultCircleColor));
         circlePaint.setAntiAlias(true);
 
@@ -517,8 +531,12 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
 
         stepTextNumberPaint = new Paint(indicatorPaint);
         stepTextNumberPaint.setTextSize(getResources().getDimension(R.dimen.stpi_default_text_size));
+        stepTextNumberPaint.setColor(a.getColor(R.styleable.StepperIndicator_stpi_stepNumberColor, defaultIndicatorColor));
 
         showStepTextNumber = a.getBoolean(R.styleable.StepperIndicator_stpi_showStepNumberInstead, false);
+        showCurrentStepAsBullet = a.getBoolean(R.styleable.StepperIndicator_stpi_showCurrentStepAsBullet, true);
+        showCurrentStepLabelAsDone = a.getBoolean(R.styleable.StepperIndicator_stpi_showCurrentStepLabelAsDone, false);
+        currentStep = a.getInteger(R.styleable.StepperIndicator_stpi_currentStep, currentStep);
 
         // Get the resource from the context style properties
         final int stepsIndicatorColorsResId = a
@@ -638,6 +656,13 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
             setLabelColor(getTextColorSecondary(getContext()));
         }
 
+        if (a.hasValue(R.styleable.StepperIndicator_stpi_labelDoneColor)) {
+            hasLabelDoneColor = true;
+            setLabelDoneColor(a.getColor(R.styleable.StepperIndicator_stpi_labelDoneColor, 0));
+        } else {
+            hasLabelDoneColor = false;
+        }
+
         if (isInEditMode() && showLabels && labels == null) {
             labels = new CharSequence[]{"First", "Second", "Third", "Fourth", "Fifth"};
         }
@@ -658,11 +683,14 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
 
         // Display at least 1 cleared step for preview in XML editor
         if (isInEditMode()) {
-            currentStep = Math.max((int) Math.ceil(stepCount / 2f), 1);
+            if(currentStep == 0) {
+                currentStep = Math.max((int) Math.ceil(stepCount / 2f), 1);
+            }
         }
 
         // Initialize the gesture detector, setup with our custom gesture listener
         gestureDetector = new GestureDetector(getContext(), gestureListener);
+        setCurrentStep(currentStep);
     }
 
     /**
@@ -821,13 +849,22 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
 
         // Compute StaticLayout for the labels
         labelLayouts = new StaticLayout[labels.length];
+        if(hasLabelDoneColor){
+            labelDoneLayouts = new StaticLayout[labels.length];
+        }
         maxLabelHeight = 0F;
         float labelSingleLineHeight = labelPaint.descent() - labelPaint.ascent();
         for (int i = 0; i < labels.length; i++) {
             if (labels[i] == null) continue;
 
             labelLayouts[i] = new StaticLayout(labels[i], labelPaint, gridWidth,
-                                               Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+                    Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+
+            if(hasLabelDoneColor){
+                labelDoneLayouts[i] = new StaticLayout(labels[i], labelDonePaint, gridWidth,
+                        Layout.Alignment.ALIGN_NORMAL, 1, 0, false);
+            }
+
             maxLabelHeight = Math.max(maxLabelHeight, labelLayouts[i].getLineCount() * labelSingleLineHeight);
         }
     }
@@ -859,12 +896,52 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
             // Draw back circle
             canvas.drawCircle(indicator, centerY, circleRadius, getStepCirclePaint(i));
 
+            if (showLabels && labelLayouts != null &&
+                    i < labelLayouts.length && labelLayouts[i] != null) {
+                if (hasLabelDoneColor && i < labelDoneLayouts.length && labelDoneLayouts[i] != null &&
+                        (i < currentStep || (showCurrentStepLabelAsDone && i == currentStep))) {
+                    drawLayout(labelDoneLayouts[i],
+                            indicator, getHeight() - getBottomIndicatorHeight() - maxLabelHeight,
+                            canvas);
+                } else {
+                    drawLayout(labelLayouts[i],
+                            indicator, getHeight() - getBottomIndicatorHeight() - maxLabelHeight,
+                            canvas);
+                }
+            }
+
+            if (useBottomIndicator) {
+                // Show the current step indicator as bottom line
+                if (i == currentStep) {
+                    // Draw custom indicator for current step only
+                    canvas.drawRect(indicator - bottomIndicatorWidth / 2, getHeight() - bottomIndicatorHeight,
+                            indicator + bottomIndicatorWidth / 2, getHeight(),
+                            useBottomIndicatorWithStepColors ? getStepIndicatorPaint(i) : indicatorPaint);
+                }
+            } else if (showCurrentStepAsBullet) {
+                // Show the current step indicator as bullet
+                // If current step, or coming back from next step and still animating
+                if ((i == currentStep && !drawFromNext) || (i == previousStep && drawFromNext && inAnimation)) {
+                    // Draw animated indicator
+                    canvas.drawCircle(indicator, centerY, animIndicatorRadius, getStepIndicatorPaint(i));
+                }
+            }
+
+            // Draw check mark
+            if(drawCheck){
+                float radius = checkRadius;
+                // Use animated radius value?
+                if ((i == previousStep && drawToNext) || (i == currentStep && drawFromNext)) radius = animCheckRadius;
+                canvas.drawCircle(indicator, centerY, radius, getStepIndicatorPaint(i));
+            }
+
             // Draw the step number inside the back circle if the flag for this is set to true
-            if (showStepTextNumber) {
+            if (showStepTextNumber &&
+                    (i != currentStep || (i == currentStep && showCurrentStepLabelAsDone))) {
                 final String stepLabel = String.valueOf(i + 1);
 
                 stepAreaRect.set((int) (indicator - circleRadius), (int) (centerY - circleRadius),
-                                 (int) (indicator + circleRadius), (int) (centerY + circleRadius));
+                        (int) (indicator + circleRadius), (int) (centerY + circleRadius));
                 stepAreaRectF.set(stepAreaRect);
 
                 Paint stepTextNumberPaint = getStepTextNumberPaint(i);
@@ -878,50 +955,18 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
                 stepAreaRectF.top += (stepAreaRect.height() - stepAreaRectF.bottom) / 2.0f;
 
                 canvas.drawText(stepLabel, stepAreaRectF.left, stepAreaRectF.top - stepTextNumberPaint.ascent(),
-                                stepTextNumberPaint);
+                        stepTextNumberPaint);
             }
 
-            if (showLabels && labelLayouts != null &&
-                    i < labelLayouts.length && labelLayouts[i] != null) {
-                drawLayout(labelLayouts[i],
-                           indicator, getHeight() - getBottomIndicatorHeight() - maxLabelHeight,
-                           canvas, labelPaint);
-            }
-
-            if (useBottomIndicator) {
-                // Show the current step indicator as bottom line
-                if (i == currentStep) {
-                    // Draw custom indicator for current step only
-                    canvas.drawRect(indicator - bottomIndicatorWidth / 2, getHeight() - bottomIndicatorHeight,
-                                    indicator + bottomIndicatorWidth / 2, getHeight(),
-                                    useBottomIndicatorWithStepColors ? getStepIndicatorPaint(i) : indicatorPaint);
-                }
-            } else {
-                // Show the current step indicator as bullet
-                // If current step, or coming back from next step and still animating
-                if ((i == currentStep && !drawFromNext) || (i == previousStep && drawFromNext && inAnimation)) {
-                    // Draw animated indicator
-                    canvas.drawCircle(indicator, centerY, animIndicatorRadius, getStepIndicatorPaint(i));
-                }
-            }
-
-            // Draw check mark
-            if (drawCheck) {
-                float radius = checkRadius;
-                // Use animated radius value?
-                if ((i == previousStep && drawToNext) || (i == currentStep && drawFromNext)) radius = animCheckRadius;
-                canvas.drawCircle(indicator, centerY, radius, getStepIndicatorPaint(i));
-
-                // Draw check bitmap
-                if (!isInEditMode() && showDoneIcon) {
-                    if ((i != previousStep && i != currentStep) ||
-                            (!inCheckAnimation && !(i == currentStep && !inAnimation))) {
-                        canvas.save();
-                        canvas.translate(indicator - (doneIcon.getIntrinsicWidth() / 2),
-                                         centerY - (doneIcon.getIntrinsicHeight() / 2));
-                        doneIcon.draw(canvas);
-                        canvas.restore();
-                    }
+            // Draw done icon
+            if (drawCheck && showDoneIcon) {
+                if ((i != previousStep && i != currentStep) ||
+                        (!inCheckAnimation && !(i == currentStep && !inAnimation))) {
+                    canvas.save();
+                    canvas.translate(indicator - (doneIcon.getIntrinsicWidth() / 2),
+                            centerY - (doneIcon.getIntrinsicHeight() / 2));
+                    doneIcon.draw(canvas);
+                    canvas.restore();
                 }
             }
 
@@ -950,7 +995,7 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
      * x and y anchored to top-middle point of StaticLayout
      */
     public static void drawLayout(Layout layout, float x, float y,
-                                  Canvas canvas, TextPaint paint) {
+                                  Canvas canvas) {
         canvas.save();
         canvas.translate(x, y);
         layout.draw(canvas);
@@ -1298,6 +1343,22 @@ public class StepperIndicator extends View implements ViewPager.OnPageChangeList
         labelPaint.setColor(color);
         requestLayout();
         invalidate();
+    }
+
+    public void setLabelDoneColor(int color) {
+        if (!hasLabelDoneColor) {
+            return;
+        }
+        if (labelDonePaint == null) {
+            labelDonePaint = new TextPaint(labelPaint);
+        }
+        labelDonePaint.setColor(color);
+        requestLayout();
+        invalidate();
+    }
+
+    public void setHasLabelDoneColor(boolean color){
+        hasLabelDoneColor = color;
     }
 
     /**

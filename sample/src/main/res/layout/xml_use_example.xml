@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!-- default style -->
+    <com.badoualy.stepperindicator.StepperIndicator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="32dp"
+        app:stpi_labels="@array/stepLabels" />
+
+    <com.badoualy.stepperindicator.StepperIndicator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="32dp"
+        app:stpi_circleRadius="11dp"
+        app:stpi_circleStyle="stroke"
+        app:stpi_indicatorColor="@color/colorPrimary"
+        app:stpi_labelColor="@color/stpi_default_circle_color"
+        app:stpi_labelDoneColor="@color/colorPrimary"
+        app:stpi_labelSize="13sp"
+        app:stpi_labels="@array/stepLabels"
+        app:stpi_lineDoneColor="@color/colorPrimary"
+        app:stpi_showCurrentStepAsBullet="true"
+        app:stpi_showCurrentStepLabelAsDone="false"
+        app:stpi_showDoneIcon="false"
+        app:stpi_showStepNumberInstead="true"
+        app:stpi_stepNumberColor="#ffffff" />
+
+    <com.badoualy.stepperindicator.StepperIndicator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="32dp"
+        app:stpi_circleRadius="11dp"
+        app:stpi_circleStyle="fill"
+        app:stpi_indicatorColor="@color/colorPrimary"
+        app:stpi_labelColor="@color/stpi_default_circle_color"
+        app:stpi_labelDoneColor="@color/colorPrimary"
+        app:stpi_labelSize="13sp"
+        app:stpi_labels="@array/stepLabels"
+        app:stpi_lineDoneColor="@color/colorPrimary"
+        app:stpi_showCurrentStepAsBullet="true"
+        app:stpi_showCurrentStepLabelAsDone="false"
+        app:stpi_showDoneIcon="false"
+        app:stpi_showStepNumberInstead="true"
+        app:stpi_stepNumberColor="#ffffff" />
+
+    <com.badoualy.stepperindicator.StepperIndicator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="32dp"
+        app:stpi_circleRadius="11dp"
+        app:stpi_circleStyle="fill"
+        app:stpi_currentStep="1"
+        app:stpi_indicatorColor="@color/colorPrimary"
+        app:stpi_indicatorRadius="11dp"
+        app:stpi_labelColor="@color/stpi_default_circle_color"
+        app:stpi_labelDoneColor="@color/colorPrimary"
+        app:stpi_labelSize="13sp"
+        app:stpi_labels="@array/stepLabels"
+        app:stpi_lineDoneColor="@color/colorPrimary"
+        app:stpi_showCurrentStepAsBullet="true"
+        app:stpi_showCurrentStepLabelAsDone="true"
+        app:stpi_showDoneIcon="false"
+        app:stpi_showStepNumberInstead="true"
+        app:stpi_stepNumberColor="#ffffff" />
+
+    <com.badoualy.stepperindicator.StepperIndicator
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="32dp"
+        app:stpi_circleRadius="11dp"
+        app:stpi_circleStyle="fill"
+        app:stpi_currentStep="1"
+        app:stpi_indicatorColor="@color/colorPrimary"
+        app:stpi_indicatorRadius="11dp"
+        app:stpi_labelColor="@color/stpi_default_circle_color"
+        app:stpi_labelDoneColor="@color/colorPrimary"
+        app:stpi_labelSize="13sp"
+        app:stpi_labels="@array/stepLabels"
+        app:stpi_lineDoneColor="@color/colorPrimary"
+        app:stpi_lineMargin="0dp"
+        app:stpi_showCurrentStepAsBullet="true"
+        app:stpi_showCurrentStepLabelAsDone="true"
+        app:stpi_showDoneIcon="false"
+        app:stpi_showStepNumberInstead="true"
+        app:stpi_stepNumberColor="#ffffff" />
+
+
+</LinearLayout>
