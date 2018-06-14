@@ -63,6 +63,11 @@ import java.util.Random;
  * <td></td>
  * </tr>
  * <tr>
+ * <td>stpi_currentStep</td>
+ * <td>current page/step</td>
+ * <td>0</td>
+ * </tr>
+ * <tr>
  * <td>stpi_circleColor</td>
  * <td>color of the stroke circle</td>
  * <td>#b3bdc2 (grey)</td>
@@ -76,6 +81,11 @@ import java.util.Random;
  * <td>stpi_circleStrokeWidth</td>
  * <td>width of circle's radius</td>
  * <td>4dp</td>
+ * </tr>
+ * <tr>
+ * <td>stpi_circleStyle</td>
+ * <td>circle style (fill/stroke)</td>
+ * <td>stroke</td>
  * </tr>
  * <tr>
  * <td>stpi_indicatorColor</td>
@@ -116,6 +126,26 @@ import java.util.Random;
  * <td>stpi_showStepNumberInstead</td>
  * <td>display text number for each step instead of bullets</td>
  * <td>false</td>
+ * </tr>
+ * <tr>
+ * <td>stpi_showStepNumberInstead</td>
+ * <td>display text number for each step instead of bullets</td>
+ * <td>false</td>
+ * </tr>
+ * <tr>
+ * <td>stpi_showCurrentStepAsBullet</td>
+ * <td>show the current page/step indicator as bullet or not</td>
+ * <td>true</td>
+ * </tr>
+ * <tr>
+ * <td>stpi_showCurrentStepLabelAsDone</td>
+ * <td>show the label of current page/step as done color or not</td>
+ * <td>false</td>
+ * </tr>
+ * <tr>
+ * <td>stpi_stepNumberColor</td>
+ * <td>color of the step number inside the back circle</td>
+ * <td>value of stpi_circleColor</td>
  * </tr>
  * <tr>
  * <td>stpi_useBottomIndicator</td>
