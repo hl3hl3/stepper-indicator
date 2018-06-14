@@ -7,7 +7,7 @@
 
 <img src="https://github.com/badoualy/stepper-indicator/blob/master/ART/screen.gif" width="300">
 
-<img src="https://github.com/badoualy/stepper-indicator/blob/master/ART/xml_attr_style_sample.png" >
+<img src="https://github.com/hl3hl3/stepper-indicator/blob/master/ART/xml_attr_style_sample.png" >
 
 Sample
 ----------------
